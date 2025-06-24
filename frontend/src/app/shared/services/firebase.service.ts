@@ -14,18 +14,33 @@
  * limitations under the License.
  */
 
-import { Injectable, Injector, inject } from '@angular/core';
-import { Firestore, collection, collectionData, doc, docData, orderBy, query, updateDoc, where } from '@angular/fire/firestore';
-import { GoogleAuthProvider, signInWithPopup } from '@firebase/auth';
-import { getDownloadURL, ref, uploadBytesResumable, UploadTaskSnapshot, UploadTask } from "firebase/storage";
-import { Auth } from '@angular/fire/auth';
-import { Analytics, isSupported, logEvent } from '@angular/fire/analytics';
-import { Storage } from '@angular/fire/storage';
+import { Injectable, Injector, inject } from "@angular/core";
+import {
+  Firestore,
+  collection,
+  collectionData,
+  doc,
+  docData,
+  orderBy,
+  query,
+  updateDoc,
+  where,
+} from "@angular/fire/firestore";
+import { GoogleAuthProvider, signInWithPopup } from "@firebase/auth";
+import {
+  getDownloadURL,
+  ref,
+  uploadBytesResumable,
+  UploadTaskSnapshot,
+  UploadTask,
+} from "firebase/storage";
+import { Auth } from "@angular/fire/auth";
+import { Analytics, isSupported, logEvent } from "@angular/fire/analytics";
+import { Storage } from "@angular/fire/storage";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
-
 export class FirebaseService {
   userData: any;
   private auth: Auth = inject(Auth);
@@ -36,7 +51,7 @@ export class FirebaseService {
   constructor(private injector: Injector) {
     isSupported().then(() => {
       this.analytics = this.injector.get(Analytics);
-    })
+    });
   }
 
   getDocument(collection: string, documentId: string) {
@@ -46,7 +61,7 @@ export class FirebaseService {
 
   getOrdersDocuments() {
     const orderCollection = collection(this.firestore, `orders`);
-    return collectionData(orderCollection, { idField: 'id' })
+    return collectionData(orderCollection, { idField: "id" });
   }
   getSearchResults(documentId: string) {
     return this.getDocument("website_search", documentId);
@@ -57,30 +72,39 @@ export class FirebaseService {
   }
 
   getUserProductsAndServicesDoc(userId: string) {
-    return doc(this.firestore, `content-creator/${userId}`)
+    return doc(this.firestore, `content-creator/${userId}`);
   }
 
   getUserProducts(userId: string) {
     const userDoc = this.getUserProductsAndServicesDoc(userId);
-    const productCollection = collection(this.firestore, `${userDoc.path}/products`);
-    return collectionData(productCollection, { idField: 'id' })
+    const productCollection = collection(
+      this.firestore,
+      `${userDoc.path}/products`
+    );
+    return collectionData(productCollection, { idField: "id" });
   }
 
   getUserServices(userId: string) {
     const userDoc = this.getUserProductsAndServicesDoc(userId);
-    const productCollection = collection(this.firestore, `${userDoc.path}/services`);
-    return collectionData(productCollection, { idField: 'id' })
+    const productCollection = collection(
+      this.firestore,
+      `${userDoc.path}/services`
+    );
+    return collectionData(productCollection, { idField: "id" });
   }
 
   getUserOrders(userId: string) {
     const orderCollection = collection(this.firestore, `orders`);
-    const filter = query(orderCollection, where("user_id", "==", userId))
-    return collectionData(filter, { idField: 'id' })
+    const filter = query(orderCollection, where("user_id", "==", userId));
+    return collectionData(filter, { idField: "id" });
   }
   getUserReturnOrders() {
     const orderCollection = collection(this.firestore, `orders`);
-    const filter = query(orderCollection, where("order_items", "array-contains", { is_returned: true }))
-    return collectionData(filter, { idField: 'id' })
+    const filter = query(
+      orderCollection,
+      where("order_items", "array-contains", { is_returned: true })
+    );
+    return collectionData(filter, { idField: "id" });
   }
 
   getUserOrdersById(documentId: string) {
@@ -91,82 +115,110 @@ export class FirebaseService {
     const orderCollection = collection(this.firestore, `orders`);
     const conversationDoc = doc(this.firestore, orderCollection.path, orderId);
     await updateDoc(conversationDoc, {
-      doc
+      doc,
     });
   }
 
   getChatMessages(userId: string, conversationId: string) {
     const userDoc = doc(this.firestore, "p4-conversations", userId);
-    const userConversations = collection(this.firestore, `${userDoc.path}/conversations`);
-    const conversationDoc = doc(this.firestore, userConversations.path, conversationId);
-    const messagesCollection = collection(this.firestore, `${conversationDoc.path}/messages`);
+    const userConversations = collection(
+      this.firestore,
+      `${userDoc.path}/conversations`
+    );
+    const conversationDoc = doc(
+      this.firestore,
+      userConversations.path,
+      conversationId
+    );
+    const messagesCollection = collection(
+      this.firestore,
+      `${conversationDoc.path}/messages`
+    );
     const orderedCollection = query(messagesCollection, orderBy("timestamp"));
     return collectionData(orderedCollection);
   }
 
   getCaseHistory(userId: string) {
     const userDoc = doc(this.firestore, "p4-conversations", userId);
-    const userConversationsCollection = collection(this.firestore, `${userDoc.path}/conversations`);
-    const orderedCollection = query(userConversationsCollection, orderBy("timestamp", "desc"));
-    return collectionData(orderedCollection, { idField: 'id' });
+    const userConversationsCollection = collection(
+      this.firestore,
+      `${userDoc.path}/conversations`
+    );
+    const orderedCollection = query(
+      userConversationsCollection,
+      orderBy("timestamp", "desc")
+    );
+    return collectionData(orderedCollection, { idField: "id" });
   }
 
   getAgentActivity(userId: string, agentActivityId: string) {
     const userDoc = doc(this.firestore, "field-agent", userId);
-    const activitiesCollection = collection(this.firestore, `${userDoc.path}/activities`);
-    const activityDoc = doc(this.firestore, activitiesCollection.path, agentActivityId);
-    return docData(activityDoc, { idField: 'id' });
+    const activitiesCollection = collection(
+      this.firestore,
+      `${userDoc.path}/activities`
+    );
+    const activityDoc = doc(
+      this.firestore,
+      activitiesCollection.path,
+      agentActivityId
+    );
+    return docData(activityDoc, { idField: "id" });
   }
 
   getAgentActivities(userId: string) {
     const userDoc = doc(this.firestore, "field-agent", userId);
-    const activitiesCollection = collection(this.firestore, `${userDoc.path}/activities`);
+    const activitiesCollection = collection(
+      this.firestore,
+      `${userDoc.path}/activities`
+    );
     const orderedCollection = query(activitiesCollection, orderBy("timestamp"));
-    return collectionData(orderedCollection, { idField: 'id' });
+    return collectionData(orderedCollection, { idField: "id" });
   }
 
-
   async googleSignin() {
+    console.log("googleSignin");
     const provider = new GoogleAuthProvider();
 
     return await signInWithPopup(this.auth, provider)
-
       .then((result) => {
-        return result.user
-      }).
-      catch(
-
-        function(error) {
-          // Handle Errors here.
-          var errorCode = error.code;
-          if (errorCode === 'auth/account-exists-with-different-credential') {
-            alert('You have already signed up with a different auth provider for that email.');
-            // If you are using multiple auth providers on your app you should handle linking
-            // the user's accounts here.
-          } else {
-            console.error(error);
-          }
-        });
+        console.log("result", result);
+        return result.user;
+      })
+      .catch(function (error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        if (errorCode === "auth/account-exists-with-different-credential") {
+          alert(
+            "You have already signed up with a different auth provider for that email."
+          );
+          // If you are using multiple auth providers on your app you should handle linking
+          // the user's accounts here.
+        } else {
+          console.error(error);
+        }
+      });
   }
 
   uploadImageToStorage(file: any): UploadTask {
     const fileUUID = window.crypto.randomUUID();
     const storageRef = ref(this.storage, "images/" + fileUUID);
-    return uploadBytesResumable(storageRef, file)
+    return uploadBytesResumable(storageRef, file);
   }
 
   uploadReturnItemImageToStorage(file: any): UploadTask {
     const fileUUID = window.crypto.randomUUID();
     const storageRef = ref(this.storage, "p7/images/" + fileUUID);
-    return uploadBytesResumable(storageRef, file)
+    return uploadBytesResumable(storageRef, file);
   }
 
   uploadReturnItemVideoToStorage(file: any): UploadTask {
     const fileUUID = window.crypto.randomUUID();
     const storageRef = ref(this.storage, "p7/videos/" + fileUUID);
-    return uploadBytesResumable(storageRef, file)
+    return uploadBytesResumable(storageRef, file);
   }
-  async getDownloadURLFromSnapshot(snapshot: UploadTaskSnapshot): Promise<string> {
+  async getDownloadURLFromSnapshot(
+    snapshot: UploadTaskSnapshot
+  ): Promise<string> {
     return await getDownloadURL(snapshot.ref);
   }
 

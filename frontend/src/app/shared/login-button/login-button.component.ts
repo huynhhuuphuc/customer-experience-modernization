@@ -14,24 +14,21 @@
  * limitations under the License.
  */
 
-import { Component } from '@angular/core';
-import { FirebaseService } from '../services/firebase.service';
-import { Dialog } from '@angular/cdk/dialog';
+import { Component } from "@angular/core";
+import { FirebaseService } from "../services/firebase.service";
+import { Dialog } from "@angular/cdk/dialog";
 
 @Component({
-  selector: 'app-login-button',
-  templateUrl: './login-button.component.html',
-  styleUrl: './login-button.component.scss',
-  standalone: true
+  selector: "app-login-button",
+  templateUrl: "./login-button.component.html",
+  styleUrl: "./login-button.component.scss",
+  standalone: true,
 })
 export class LoginButtonComponent {
   photoURL: any;
   userLoggedIn: boolean = false;
-  constructor(public firebaseService: FirebaseService,
-    public dialog: Dialog) {
-  }
+  constructor(public firebaseService: FirebaseService, public dialog: Dialog) {}
   getLogin() {
-    this.firebaseService.googleSignin()
+    this.firebaseService.googleSignin();
   }
-
 }

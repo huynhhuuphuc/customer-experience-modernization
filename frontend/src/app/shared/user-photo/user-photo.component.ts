@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-import { Component, OnDestroy, inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { LoginButtonComponent } from '../login-button/login-button.component';
-import { Subscription } from 'rxjs';
-import { Dialog } from '@angular/cdk/dialog';
-import { Auth, User, user } from '@angular/fire/auth';
-import { NgIf } from '@angular/common';
+import { Component, OnDestroy, inject } from "@angular/core";
+import { Router } from "@angular/router";
+// import { LoginButtonComponent } from '../login-button/login-button.component';
+import { Subscription } from "rxjs";
+import { Dialog } from "@angular/cdk/dialog";
+import { Auth, User, user } from "@angular/fire/auth";
+import { NgIf } from "@angular/common";
+import { LoginButtonComponent } from "../login-button/login-button.component";
 
 @Component({
-  selector: 'app-user-photo',
+  selector: "app-user-photo",
   standalone: true,
-  templateUrl: './user-photo.component.html',
-  styleUrl: './user-photo.component.scss',
-  imports: [
-    NgIf,
-  ]
+  templateUrl: "./user-photo.component.html",
+  styleUrl: "./user-photo.component.scss",
+  imports: [NgIf],
 })
 export class UserPhotoComponent implements OnDestroy {
   photoURL: string | undefined;
@@ -48,26 +47,24 @@ export class UserPhotoComponent implements OnDestroy {
         if (aUser.photoURL) {
           this.photoURL = aUser.photoURL;
         }
-      }
-      else {
+      } else {
         this.userLoggedIn = false;
-        this.showLogIn()
+        this.showLogIn();
       }
-    })
+    });
   }
 
   navigateToUserJourney() {
     this.userLoggedIn = true;
-    this._router.navigate(['user-journey'])
+    this._router.navigate(["user-journey"]);
   }
 
-
   showLogIn(): void {
-    this.dialog.open(LoginButtonComponent, {
-      disableClose: true,
-      width: '350px',
-      panelClass: 'login-container'
-    });
+    // this.dialog.open(LoginButtonComponent, {
+    //   disableClose: true,
+    //   width: "350px",
+    //   panelClass: "login-container",
+    // });
   }
 
   ngOnDestroy() {
